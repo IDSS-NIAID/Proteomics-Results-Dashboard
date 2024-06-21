@@ -1,0 +1,9 @@
+^LICENSE\.md$
+^README\.md$
+README.qmd
+
+^.*\.Rproj$
+^\.Rproj\.user$
+
+^shiny$
+^docs$
