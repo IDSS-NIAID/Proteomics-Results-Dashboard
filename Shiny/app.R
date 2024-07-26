@@ -17,6 +17,8 @@ library(RSQLite)
  # PeptideName = paste("Peptide", 1:4)
 #)
 
+devtools:: install()
+
 #data frames 
 import_raw<- function(peptides_file, proteins_file, db_file) {
   peptides <- read.table (peptides_file, header = TRUE, sep = "\t")
