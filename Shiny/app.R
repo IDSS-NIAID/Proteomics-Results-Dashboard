@@ -4,17 +4,35 @@
 library(shiny)
 library(DT)
 library(bslib)
+library(RSQLite)
 
 # Sample data
-proteins <- data.frame(
-  ProteinID = 1:4,
-  ProteinName = paste("Protein", 1:4)
-)
+#proteins <- data.frame(
+#  ProteinID = 1:4,
+ # ProteinName = paste("Protein", 1:4)
+#)
 
-peptides <- data.frame(
-  ProteinID = rep(1:4, each = 4),
-  PeptideName = paste("Peptide", 1:4)
-)
+#peptides <- data.frame(
+#  ProteinID = rep(1:4, each = 4),
+ # PeptideName = paste("Peptide", 1:4)
+#)
+
+#data.frames 
+import_raw<- function(peptide_file, protein_file, db_file) {
+  peptide <- read.table (peptide_file, header = TRUE, sep = "\t")
+  protein <- read.table(protein_file, header = TRUE, sep = "\t")
+  
+  #new SQLites database
+  con <- dbConnect(SQLite(), dbname = db_file)
+  
+  #write the data to the database 
+  dbWriteTable(con, 'peptide', peptide, overwrite = TRUE)
+  dbWriteTable(con, 'protein', peptide, overwrite = TRUE)
+  
+  #Close the connection
+  dbDisconnect(con)
+}
+
 
 #bslib theme
 base_theme <- bs_theme(bootswatch = "quartz")
@@ -74,7 +92,7 @@ ui <- navbarPage(
 server <- function(input, output, session) {
   
   output$proteinTable <- renderDT({
-    datatable(proteins, selection = 'single', options = list(pageLength = 4))
+    datatable(protein, selection = 'single', options = list(pageLength = 4))
   })
   
   output$peptideTable <- renderDT({
