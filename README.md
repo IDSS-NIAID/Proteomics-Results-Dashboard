@@ -1,5 +1,7 @@
 # Proteomics-Results-Dashboard
 
+<!-- refer to http://fragpipe-analyst.nesvilab.org/ for some inspiration - not quite what we are going for, but... -->
+
 ## Conventions
 
 We will generally follow the conventions described in [R Packages](https://r-pkgs.org/) by Hadley Wickham. [JoesFlow](https://github.com/niaid/JoesFlow) is set up using the same conventions we will be using here.
@@ -17,6 +19,10 @@ Other directories (i.e. `man`) will be auto-generated during package compilation
 ### Documentation
 
 We will use [roxygen2](https://r-pkgs.org/man.html) tags for documentation.
+
+#### Data
+
+...put data documentation here for now
 
 ### Building
 

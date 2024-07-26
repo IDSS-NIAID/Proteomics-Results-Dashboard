@@ -7,3 +7,5 @@ README.qmd
 
 ^shiny$
 ^docs$
+^test$
+^tmp$

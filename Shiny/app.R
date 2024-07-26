@@ -6,43 +6,15 @@ library(DT)
 library(bslib)
 library(RSQLite)
 
-# Sample data
-#proteins <- data.frame(
-#  ProteinID = 1:4,
- # ProteinName = paste("Protein", 1:4)
-#)
+library(ProtResDash)
 
-#peptides <- data.frame(
-#  ProteinID = rep(1:4, each = 4),
- # PeptideName = paste("Peptide", 1:4)
-#)
+# move default data to sqlite file
+extdata <- system.file("extdata", package = 'ProtResDash')
 
-devtools:: install()
+import_raw ( file.path(extdata, "peptides.txt"), 
+             file.path(extdata, "proteinGroups.txt"), 
+             "data/protein_peptidedb.sqlite")
 
-#data frames 
-import_raw<- function(peptides_file, proteins_file, db_file) {
-  peptides <- read.table (peptides_file, header = TRUE, sep = "\t")
-  proteins <- read.table(proteins_file, header = TRUE, sep = "\t")
-  
-  #new SQLites database
-  con <- dbConnect(SQLite(), dbname = db_file)
-  
-  #write the data to the database 
-  dbWriteTable(con, 'peptides', peptides, overwrite = TRUE)
-  dbWriteTable(con, 'proteins', peptides, overwrite = TRUE)
-  
-  #close the connection
-  dbDisconnect(con)
-}
-
-import_raw ( "inst/extdata/peptides.txt", "inst/extdata/proteinGroups.txt", 
-"data/protein_peptidedb.sqlite")
-
-#to connect the SQLite Database and get the data
-con <-dbConnect(SQLite(), dbname = 'data/protein_peptidedb.sqlite')
-proteins <- dbReadTable(con, "proteins")
-peptides <- dbReadTable(con, "peptides")
-dbDisconnect(con)
 
 #bslib theme
 base_theme <- bs_theme(bootswatch = "quartz")

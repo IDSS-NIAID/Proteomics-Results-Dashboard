@@ -4,11 +4,14 @@ Version: 0.0.1
 Authors@R: c(person('Randy', 'Johnson', email = 'randall.johnson@nih.gov', 
                     role = 'aut'),
              person('Kelin', 'Argueta', email = 'arguetakelin0799@gmail.com',
-                    role = c('cre', 'aut'))
+                    role = c('cre', 'aut')))
 Description: This package provides a dashboard for visualizing proteomics results.
 License: MIT + file LICENSE
-Depends: R (>=4.0)
-Imports:
+Depends: R (>= 4.0)
+Imports: 
+  RSQLite,
+  utils
 URL: https://github.com/IDSS-NIAID/Proteomics-Results-Dashboard
 BugReports: https://github.com/IDSS-NIAID/Proteomics-Results-Dashboard/issues
 Encoding: UTF-8
+RoxygenNote: 7.3.1
