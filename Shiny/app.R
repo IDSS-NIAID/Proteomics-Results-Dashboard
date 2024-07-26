@@ -36,7 +36,11 @@ import_raw<- function(peptides_file, proteins_file, db_file) {
 import_raw ( "inst/extdata/peptides.txt", "inst/extdata/proteinGroups.txt", 
 "data/protein_peptidedb.sqlite")
 
-
+#to connect the SQLite Database and get the data
+con <-dbConnect(SQLite(), dbname = 'data/protein_peptidedb.sqlite')
+proteins <- dbReadTable(con, "proteins")
+peptides <- dbReadTable(con, "peptides")
+dbDisconnect(con)
 
 #bslib theme
 base_theme <- bs_theme(bootswatch = "quartz")
