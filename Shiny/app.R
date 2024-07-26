@@ -17,21 +17,25 @@ library(RSQLite)
  # PeptideName = paste("Peptide", 1:4)
 #)
 
-#data.frames 
-import_raw<- function(peptide_file, protein_file, db_file) {
-  peptide <- read.table (peptide_file, header = TRUE, sep = "\t")
-  protein <- read.table(protein_file, header = TRUE, sep = "\t")
+#data frames 
+import_raw<- function(peptides_file, proteins_file, db_file) {
+  peptides <- read.table (peptides_file, header = TRUE, sep = "\t")
+  proteins <- read.table(proteins_file, header = TRUE, sep = "\t")
   
   #new SQLites database
   con <- dbConnect(SQLite(), dbname = db_file)
   
   #write the data to the database 
-  dbWriteTable(con, 'peptide', peptide, overwrite = TRUE)
-  dbWriteTable(con, 'protein', peptide, overwrite = TRUE)
+  dbWriteTable(con, 'peptides', peptides, overwrite = TRUE)
+  dbWriteTable(con, 'proteins', peptides, overwrite = TRUE)
   
-  #Close the connection
+  #close the connection
   dbDisconnect(con)
 }
+
+import_raw ( "inst/extdata/peptides.txt", "inst/extdata/proteinGroups.txt", 
+"data/protein_peptidedb.sqlite")
+
 
 
 #bslib theme
@@ -92,7 +96,7 @@ ui <- navbarPage(
 server <- function(input, output, session) {
   
   output$proteinTable <- renderDT({
-    datatable(protein, selection = 'single', options = list(pageLength = 4))
+    datatable(proteins, selection = 'single', options = list(pageLength = 4))
   })
   
   output$peptideTable <- renderDT({
