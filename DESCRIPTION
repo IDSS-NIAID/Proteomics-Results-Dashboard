@@ -9,6 +9,7 @@ Description: This package provides a dashboard for visualizing proteomics result
 License: MIT + file LICENSE
 Depends: R (>= 4.0)
 Imports: 
+  DBI,
   RSQLite,
   utils
 URL: https://github.com/IDSS-NIAID/Proteomics-Results-Dashboard

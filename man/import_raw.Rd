@@ -2,7 +2,8 @@
 % Please edit documentation in R/import_raw.R
 \name{import_raw}
 \alias{import_raw}
-\title{Import raw data}
+\title{import_raw
+Import raw data from MaxQuant into a SQLite database}
 \usage{
 import_raw(peptides_file, proteins_file, db_file)
 }
@@ -11,8 +12,9 @@ import_raw(peptides_file, proteins_file, db_file)
 
 \item{proteins_file}{A character string of the path to the proteins file}
 
-\item{db_file}{A character string of the path to the SQLite database}
+\item{db_file}{A character string of the path to the SQLite database file}
 }
 \description{
-This function imports raw data from MaxQuant output files into an SQLite database
+import_raw
+Import raw data from MaxQuant into a SQLite database
 }
