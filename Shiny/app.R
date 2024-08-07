@@ -5,6 +5,8 @@ library(shiny)
 library(DT)
 library(bslib)
 library(RSQLite)
+library(dplyr)
+library(dbplyr)
 
 library(ProtResDash)
 
@@ -14,6 +16,20 @@ extdata <- system.file("extdata", package = 'ProtResDash')
 import_raw ( file.path(extdata, "peptides.txt"), 
              file.path(extdata, "proteinGroups.txt"), 
              "data/protein_peptidedb.sqlite")
+
+con <- dbConnect(SQLite(), dbname = "data/protein_peptidedb.sqlite")
+peptides <- tbl(con, "peptides")
+proteins <- tbl(con, "proteins")
+
+# find all unique protein group IDs
+ids <- select(peptides, Protein.group.IDs) |> # pull all Protein.group.IDs from peptides
+  collect() |>                                # convert to an R data.frame
+  unique() |>                                 # find unique values
+  unlist()                                    # convert from a data.frame to a vector
+
+# search for protein modifications for the first protein group ID
+filter(proteins, Protein.group.IDs == !!ids[1]) |> # pull all rows from proteins where Protein.group.IDs == '629'
+  collect()                                        # return an R data.frame
 
 
 #bslib theme
@@ -87,4 +103,3 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-
