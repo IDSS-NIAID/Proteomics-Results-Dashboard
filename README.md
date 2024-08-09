@@ -24,6 +24,19 @@ We will use [roxygen2](https://r-pkgs.org/man.html) tags for documentation.
 
 ...put data documentation here for now
 
+Description: 
+The test data were sourced from the PRIDE Archive, specifically from the project PXD038652(PRIDE Archive Project). The dataset includes proteocims data on cow proteins (Bos taurus), which were analyzed to identify and quantify the protein groups present. 
+
+
+PRIDE Archive. (2023). "PXD038652: Proteomics data on Bos taurus proteins." European Bioinformatics Institute (EBI). Available at: https://www.ebi.ac.uk/pride/archive/projects/PXD038652.
+
+
+Publication List
+Serafim TD, Iniguez E, Barletta ABF, Cecilio P, Doehl JSP, Short M, Lack J, Nair V, Disotuar M, Wilson T, Coutinho-Abreu IV, Meneses C, Andersen J, Alves E Silva TL, Oliveira F, Vega-Rodriguez J, Barillas-Mury C, Ribeiro JMC, Beverley SM, Kamhawi S, Valenzuela JG, Leishmania genetic exchange is mediated by IgM natural antibodies. Nature, 623(7985):149-156(2023) 
+https://www.ncbi.nlm.nih.gov/pubmed?term=37880367
+
+
+
 ### Building
 
 We will use [devtools](https://bookdown.org/rdpeng/RProgDA/the-devtools-package.html) to help with package building. The following commands will be used:
