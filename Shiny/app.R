@@ -7,7 +7,6 @@ library(bslib)
 library(RSQLite)
 library(dplyr)
 library(dbplyr)
-
 library(ProtResDash)
 
 # move default data to sqlite file
@@ -27,7 +26,7 @@ ids <- select(peptides, Protein.group.IDs) |> # pull all Protein.group.IDs from 
   unique() |>                                 # find unique values
   unlist()                                    # convert from a data.frame to a vector
 
-# search for protein modifications for the first protein group ID
+#** search for protein modifications for the first protein group ID
 filter(proteins, Protein.group.IDs == !!ids[1]) |> # pull all rows from proteins where Protein.group.IDs == '629'
   collect()                                        # return an R data.frame
 
@@ -93,10 +92,25 @@ server <- function(input, output, session) {
     datatable(proteins, selection = 'single', options = list(pageLength = 4))
   })
   
+  
   output$peptideTable <- renderDT({
     req(input$proteinTable_rows_selected)
-    selectedProteinID <- proteins$ProteinID[input$proteinTable_rows_selected]
-    selectedPeptides <- peptides[peptides$ProteinID == selectedProteinID, ]
+    
+   # selectedProteinID <- proteins$ProteinID[input$proteinTable_rows_selected]
+   # selectedPeptides <- peptides[peptides$ProteinID == selectedProteinID, ]
+   #** search for protein modifications for the first protein group ID
+    #filter(proteins, Protein.group.IDs == !!ids[1]) |> # pull all rows from proteins where Protein.group.IDs == '629'
+   # collect()  
+    
+    selectedProteinID <- proteins %>%
+       filter(row_number()== input$proteinTable_rows_selected) %>% 
+       pull(Protein.group.IDs) ## Extract the Protein.group.IDs from the selected row
+    
+    selectedPeptides <- peptides %>% 
+      filter(Protein.group.IDs == !!ids[1]) |>
+      collect() ## Convert the filtered result to a data frame
+     
+    
     datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
   })
   
