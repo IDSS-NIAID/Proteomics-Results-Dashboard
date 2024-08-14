@@ -103,11 +103,11 @@ server <- function(input, output, session) {
    # collect()  
     
     selectedProteinID <- proteins %>%
-       filter(row_number()== input$proteinTable_rows_selected) %>% 
+       slice(row_number()== input$proteinTable_rows_selected) %>% 
        pull(Protein.group.IDs) ## Extract the Protein.group.IDs from the selected row
     
     selectedPeptides <- peptides %>% 
-      filter(Protein.group.IDs == !!ids[1]) |>
+      filter(Protein.group.IDs == !!selectedProteinID[1]) |>
       collect() ## Convert the filtered result to a data frame
      
     
