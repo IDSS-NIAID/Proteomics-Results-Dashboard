@@ -10,6 +10,8 @@ License: MIT + file LICENSE
 Depends: R (>= 4.0)
 Imports: 
   DBI,
+  dplyr,
+  ggplot2,
   RSQLite,
   utils
 URL: https://github.com/IDSS-NIAID/Proteomics-Results-Dashboard
