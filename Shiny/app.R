@@ -72,37 +72,44 @@ ui <- navbarPage(
         )
       )
     )
-  )
-)
+  ),
 
+# New QC Tab
+  tabPanel(
+    "QC",
+    fluidRow(
+      column(
+        width = 6,
+        h3("PCA Plot"),
+           plotOutput("PCA Plot")
+        )
+      )
+    )
+  )
 
 server <- function(input, output, session) {
   
   output$proteinTable <- renderDT({
-    datatable(proteins, selection = 'single', options = list(pageLength = 4))
+    req(proteins) 
+    datatable(collect(proteins), selection = 'single', options = list(pageLength = 4))
   })
-  
   
   output$peptideTable <- renderDT({
     req(input$proteinTable_rows_selected)
     
-   # selectedProteinID <- proteins$ProteinID[input$proteinTable_rows_selected]
-   # selectedPeptides <- peptides[peptides$ProteinID == selectedProteinID, ]
-   #** search for protein modifications for the first protein group ID
-    #filter(proteins, Protein.group.IDs == !!ids[1]) |> # pull all rows from proteins where Protein.group.IDs == '629'
-   # collect()  
     
     selectedProteinID <- proteins %>%
        slice(row_number()== input$proteinTable_rows_selected) %>% 
-       pull(Protein.group.IDs) ## Extract the Protein.group.IDs from the selected row
+       pull(Protein.group.IDs) # Extract the Protein.group.IDs from the selected row
     
     selectedPeptides <- peptides %>% 
       filter(Protein.group.IDs == !!selectedProteinID[1]) |>
-      collect() ## Convert the filtered result to a data frame
+      collect() # Convert the filtered result to a data frame
      
     
     datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
   })
+  
   
 }
 
