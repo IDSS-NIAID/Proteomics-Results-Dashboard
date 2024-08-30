@@ -30,3 +30,4 @@ data <- select(proteins, starts_with('Reporter.intensity.corrected')) |>
 group <- rep(c('control', 'IgM'), each = 5)
 
 pcaPlot(data, group)
+

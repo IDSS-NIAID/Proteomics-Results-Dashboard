@@ -1,5 +1,3 @@
-
-
 #Libraries
 library(shiny)
 library(DT)
@@ -43,7 +41,9 @@ peptide_theme <- bs_add_rules(base_theme,
 )
 
 #UI
-ui <- navbarPage(
+ui <- div(
+  style = "overflow-x: auto; width:100%",
+  navbarPage(
   theme = base_theme,
   title = "Protein and Peptide Viewer",
   
@@ -73,19 +73,20 @@ ui <- navbarPage(
       )
     )
   ),
-
-# New QC Tab
+  
+  # New QC Tab
   tabPanel(
     "QC",
     fluidRow(
       column(
         width = 6,
         h3("PCA Plot"),
-           plotOutput("PCA Plot")
-        )
+        plotOutput("pcaPlot")
       )
+     )
     )
   )
+)
 
 server <- function(input, output, session) {
   
@@ -99,17 +100,34 @@ server <- function(input, output, session) {
     
     
     selectedProteinID <- proteins %>%
-       slice(row_number()== input$proteinTable_rows_selected) %>% 
-       pull(Protein.group.IDs) # Extract the Protein.group.IDs from the selected row
+      slice(row_number()== input$proteinTable_rows_selected) %>% 
+      pull(Protein.group.IDs) # Extract the Protein.group.IDs from the selected row
     
     selectedPeptides <- peptides %>% 
       filter(Protein.group.IDs == !!selectedProteinID[1]) |>
       collect() # Convert the filtered result to a data frame
-     
+    
     
     datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
   })
   
+  output$pcaPlot <- renderPlot(
+    {
+      plot(rnorm(1000), rnorm(1000),  #Sample of a scatterplot in the QC Tab
+           main = "PCA Plot",
+           xlab = "X-axis ",
+           ylab = "Y-axis ")
+      
+    },
+    width = "auto", #the default, uses the size specified by plotOutput()
+    height = "auto",
+    res = 72, #Resolution of resulting plot, in pixels per inch
+    alt = NA,
+    env = parent.frame(), 
+    quoted = FALSE,
+    execOnResize = FALSE,
+    outputArgs = list()
+  )
   
 }
 
