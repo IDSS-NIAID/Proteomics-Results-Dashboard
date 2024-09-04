@@ -23,11 +23,8 @@ proteins <- tbl(con, "proteins")
 # LM_IgM_5: 131. These are then fractionated for a total of 12 acquisitions
 # (files PI22-27419.raw to PI22-27430.raw).
 
-data <- select(proteins, starts_with('Reporter.intensity.corrected')) |>
+select(proteins, starts_with('Reporter.intensity.corrected')) |>
   select(1:10) |>
-  collect()
+  collect() |>
 
-group <- rep(c('control', 'IgM'), each = 5)
-
-pcaPlot(data, group)
-
+  pcaPlot(group = rep(c('control', 'IgM'), each = 5))
