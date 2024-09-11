@@ -42,7 +42,7 @@ peptide_theme <- bs_add_rules(base_theme,
 
 #UI
 ui <- div(
-  style = "overflow-x: auto; width:100%",
+  style = "overflow-x: scroll; width:100%; max-width:100%;",
   navbarPage(
   theme = base_theme,
   title = "Protein and Peptide Viewer",
@@ -59,7 +59,11 @@ ui <- div(
           tags$style(HTML("
             .dataTables_filter input {
               width: 50% !important;
+              overflow: scroll;
             }
+           .shiny-input-container{
+           color: #474747;
+           }
           "))
         )
       ),
@@ -68,7 +72,8 @@ ui <- div(
         h3("Peptide Description:"),
         tags$div(
           class = "peptide-theme",
-          DTOutput("peptideTable")
+          DTOutput("peptideTable"),
+         
         )
       )
     )
@@ -98,37 +103,49 @@ server <- function(input, output, session) {
   output$peptideTable <- renderDT({
     req(input$proteinTable_rows_selected)
     
-    
     selectedProteinID <- proteins %>%
-      slice(row_number()== input$proteinTable_rows_selected) %>% 
-      pull(Protein.group.IDs) # Extract the Protein.group.IDs from the selected row
+      slice(row_number() == input$proteinTable_rows_selected) %>% 
+      pull(Protein.group.IDs) #Extract the Protein.group.IDs from the selected row. 
     
     selectedPeptides <- peptides %>% 
-      filter(Protein.group.IDs == !!selectedProteinID[1]) |>
-      collect() # Convert the filtered result to a data frame
-    
+      filter(Protein.group.IDs == !!selectedProteinID[1]) %>%
+      collect()
     
     datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
   })
   
-  output$pcaPlot <- renderPlot(
-    {
-      plot(rnorm(1000), rnorm(1000),  #Sample of a scatterplot in the QC Tab
-           main = "PCA Plot",
-           xlab = "X-axis ",
-           ylab = "Y-axis ")
+  output$pcaPlot <- renderPlot({
+    pca_data <- proteins %>%
+      select(starts_with('Reporter.intensity.corrected')) %>%
+      collect() %>%
+      na.omit()
+    
+    # Check if there is enough data for PCA (more than one row and column)
+    if (nrow(pca_data) > 1 && ncol(pca_data) > 1) {
       
-    },
-    width = "auto", #the default, uses the size specified by plotOutput()
-    height = "auto",
-    res = 72, #Resolution of resulting plot, in pixels per inch
-    alt = NA,
-    env = parent.frame(), 
-    quoted = FALSE,
-    execOnResize = FALSE,
-    outputArgs = list()
-  )
-  
+      pca_res <- prcomp(pca_data, center = TRUE, scale. = TRUE)
+      pca_df <- as.data.frame(pca_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
+      
+      # Create a group vector with the correct length
+      pca_df$Group <- rep(c('Group 1', 'Group 2'), length.out = nrow(pca_df))
+      
+      # Scatter plot
+      plot(pca_df$PC1, pca_df$PC2, col = as.factor(pca_df$Group),
+           xlab = "Group 1",
+           ylab = "Group 2",
+           main = "PCA Plot",
+           pch = 19)
+      legend("topright", legend = levels(as.factor(pca_df$Group)), 
+             col = 1:2, pch = 19)
+      
+    } 
+    
+  }, width = "auto", height = "auto", res = 72)
 }
 
 shinyApp(ui, server)
+
+
+
+
+

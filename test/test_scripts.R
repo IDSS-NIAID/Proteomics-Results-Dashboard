@@ -28,3 +28,4 @@ select(proteins, starts_with('Reporter.intensity.corrected')) |>
   collect() |>
 
   pcaPlot(group = rep(c('control', 'IgM'), each = 5))
+
