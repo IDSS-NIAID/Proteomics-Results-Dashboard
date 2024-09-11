@@ -127,7 +127,7 @@ server <- function(input, output, session) {
       pca_df <- as.data.frame(pca_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
       
       # Create a group vector with the correct length
-      pca_df$Group <- rep(c('Group 1', 'Group 2'), length.out = nrow(pca_df))
+      pca_df$Group <- rep(c('Control', 'IgM'), length.out = nrow(pca_df))
       
       # Scatter plot
       plot(pca_df$PC1, pca_df$PC2, col = as.factor(pca_df$Group),
