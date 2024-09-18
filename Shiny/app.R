@@ -72,7 +72,7 @@ ui <- div(
         h3("Peptide Description:"),
         tags$div(
           class = "peptide-theme",
-          DTOutput("peptideTable"),
+          DTOutput("peptideTable")
          
         )
       )
@@ -96,8 +96,20 @@ ui <- div(
 server <- function(input, output, session) {
   
   output$proteinTable <- renderDT({
-    req(proteins) 
-    datatable(collect(proteins), selection = 'single', options = list(pageLength = 4))
+     req(proteins)
+    
+    datatable(collect(select(proteins, c('Sequence','Mass','Proteins', 
+                                         'Reporter.intensity.corrected.1',
+                                         'Reporter.intensity.corrected.2',
+                                         'Reporter.intensity.corrected.3',
+                                         'Reporter.intensity.corrected.4',
+                                         'Reporter.intensity.corrected.5',
+                                         'Reporter.intensity.corrected.6',
+                                         'Reporter.intensity.corrected.7',
+                                         'Reporter.intensity.corrected.8',
+                                         'Reporter.intensity.corrected.9',
+                                         'Reporter.intensity.corrected.10',))), 
+                          selection = 'single', options = list(pageLength = 4))
   })
   
   output$peptideTable <- renderDT({
@@ -114,38 +126,34 @@ server <- function(input, output, session) {
     datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
   })
   
-  output$pcaPlot <- renderPlot({
-    pca_data <- proteins %>%
-      select(starts_with('Reporter.intensity.corrected')) %>%
-      collect() %>%
-      na.omit()
+  if (nrow(data) > 1 && ncol(data) > 1) 
     
-    # Check if there is enough data for PCA (more than one row and column)
-    if (nrow(pca_data) > 1 && ncol(pca_data) > 1) {
-      
-      pca_res <- prcomp(pca_data, center = TRUE, scale. = TRUE)
-      pca_df <- as.data.frame(pca_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
-      
-      # Create a group vector with the correct length
-      pca_df$Group <- rep(c('Control', 'IgM'), length.out = nrow(pca_df))
-      
-      # Scatter plot
-      plot(pca_df$PC1, pca_df$PC2, col = as.factor(pca_df$Group),
-           xlab = "Group 1",
-           ylab = "Group 2",
-           main = "PCA Plot",
-           pch = 19)
-      legend("topright", legend = levels(as.factor(pca_df$Group)), 
-             col = 1:2, pch = 19)
-      
-    } 
+    {
+      output$pcaPlot <- renderPlot ({
+        data <- proteins %>%
+          select(starts_with('Reporter.intensity.corrected')) %>%
+          collect() %>%
+          na.omit()
+        
+        pca_res <- prcomp(data, center = TRUE, scale. = TRUE)
+        pca_df <- as.data.frame(pca_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
+        
+        pcaPlot(data,
+                rep(c('Control', 'IgM'), length.out = nrow(pca_df)))
+      } ) 
+      }
     
-  }, width = "auto", height = "auto", res = 72)
-}
+   else {
+    plot(NA, NA, xlim = 0:1, ylim = 0:1, type = "n", xlab = "",
+         main = "Not enough data for PCA")
+      }
+  }
+  
 
-shinyApp(ui, server)
-
-
-
-
-
+  shinyApp(ui, server)  
+  
+  
+  
+  
+    
+  
