@@ -132,14 +132,14 @@ server <- function(input, output, session) {
       output$pcaPlot <- renderPlot ({
         data <- proteins %>%
           select(starts_with('Reporter.intensity.corrected')) %>%
-          collect() %>%
-          na.omit()
+          select(1:10) |>
+          collect() 
         
         pca_res <- prcomp(data, center = TRUE, scale. = TRUE)
         pca_df <- as.data.frame(pca_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
         
         pcaPlot(data,
-                rep(c('Control', 'IgM'), length.out = nrow(pca_df)))
+                rep(c('Control', 'IgM'), each = 5))
       } ) 
       }
     
