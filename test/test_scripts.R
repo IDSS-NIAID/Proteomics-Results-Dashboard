@@ -23,9 +23,36 @@ proteins <- tbl(con, "proteins")
 # LM_IgM_5: 131. These are then fractionated for a total of 12 acquisitions
 # (files PI22-27419.raw to PI22-27430.raw).
 
-select(proteins, starts_with('Reporter.intensity.corrected')) |>
+data <- proteins |>
+  select(starts_with('Reporter.intensity.corrected')) |>
   select(1:10) |>
-  collect() |>
+  collect()
 
-  pcaPlot(group = rep(c('control', 'IgM'), each = 5))
+library(tidyr)
+library(stringr)
+library(ggplot2)
+library(RColorBrewer)
 
+##### Distribution of intensity scores #####
+pivot_longer(data, everything(), names_to = 'sample', values_to = 'intensity') |>
+  mutate(sample = str_replace(sample, 'Reporter.intensity.corrected.', ''),
+         intensity = intensity + 1) |>
+  
+  ggplot(aes(x = sample, y = intensity, group = sample)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  theme_minimal()
+
+
+##### Missing Values by Sample #####
+
+# count missing values
+data |>
+  pivot_longer(everything(), names_to = 'sample', values_to = 'intensity') |>
+  mutate(sample = str_replace(sample, 'Reporter.intensity.corrected.', ''),
+         missing = is.na(intensity)) |>
+  
+  ggplot(aes(sample, fill = missing)) +
+  geom_bar() +
+  theme_minimal() +
+  scale_fill_brewer(palette = 'Paired')
