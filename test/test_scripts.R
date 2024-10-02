@@ -56,3 +56,7 @@ data |>
   geom_bar() +
   theme_minimal() +
   scale_fill_brewer(palette = 'Paired')
+
+
+
+

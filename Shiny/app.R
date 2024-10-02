@@ -87,6 +87,16 @@ ui <- div(
         width = 6,
         h3("PCA Plot"),
         plotOutput("pcaPlot")
+      ),
+      column(
+        width = 6,
+        h3("Box plot"),
+        plotOutput("Box Plot")
+      ),
+      column(
+        width = 6,
+        h3("Bar Plot"),
+        plotOutput("Bar Plot")
       )
      )
     )
@@ -108,8 +118,7 @@ server <- function(input, output, session) {
                                          'Reporter.intensity.corrected.7',
                                          'Reporter.intensity.corrected.8',
                                          'Reporter.intensity.corrected.9',
-                                         'Reporter.intensity.corrected.10',))), 
-                          selection = 'single', options = list(pageLength = 4))
+                                         'Reporter.intensity.corrected.10'))),  selection = 'single', options = list(pageLength = 4))
   })
   
   output$peptideTable <- renderDT({
@@ -126,6 +135,7 @@ server <- function(input, output, session) {
     datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
   })
   
+  #PCA Plot
   if (nrow(data) > 1 && ncol(data) > 1) 
     
     {
@@ -140,20 +150,41 @@ server <- function(input, output, session) {
         
         pcaPlot(data,
                 rep(c('Control', 'IgM'), each = 5))
-      } ) 
-      }
+      
+        
+        } ) 
+      
+      #Box Plot
+      {
+        output$boxPlot <- renderPlot ({
+          data <- proteins %>%
+            select(starts_with('Reporter.intensity.corrected')) %>%
+            select(1:10) |>
+            collect() 
+          
+          box_res <- prcomp(data, center = TRUE, scale. = TRUE)
+          box_df <- as.data.frame(box_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
+          
+          boxPlot(data,
+                  rep(c('Control', 'IgM'), each = 5))
+          
+        } ) 
+  
+  }
+  }
     
    else {
     plot(NA, NA, xlim = 0:1, ylim = 0:1, type = "n", xlab = "",
          main = "Not enough data for PCA")
       }
-  }
+} 
+
+shinyApp(ui, server) 
   
 
-  shinyApp(ui, server)  
-  
-  
-  
-  
-    
+
+
+
+
+
   
