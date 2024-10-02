@@ -6,6 +6,10 @@ library(RSQLite)
 library(dplyr)
 library(dbplyr)
 library(ProtResDash)
+library(tidyr)
+library(stringr)
+
+source("~/Proteomics-Results-Dashboard/R/boxPlot.R")
 
 # move default data to sqlite file
 extdata <- system.file("extdata", package = 'ProtResDash')
@@ -162,11 +166,10 @@ server <- function(input, output, session) {
             select(1:10) |>
             collect() 
           
-          box_res <- prcomp(data, center = TRUE, scale. = TRUE)
-          box_df <- as.data.frame(box_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
-          
-          boxPlot(data,
-                  rep(c('Control', 'IgM'), each = 5))
+          # box_res <- prcomp(data, center = TRUE, scale. = TRUE)
+          # box_df <- as.data.frame(box_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
+          # 
+          boxPlot(data)
           
         } ) 
   

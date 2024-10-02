@@ -4,7 +4,7 @@ boxPlot <- function(data) {
   ##Box Plot 
   long_data <- data |>
     
-  pivot_longer(data, everything(), names_to = 'sample', values_to = 'intensity') |>
+  pivot_longer(everything(), names_to = 'sample', values_to = 'intensity') |>
     mutate(sample = str_replace(sample, 'Reporter.intensity.corrected.', ''),
            intensity = intensity + 1)
     
