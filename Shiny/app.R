@@ -9,14 +9,21 @@ library(ProtResDash)
 library(tidyr)
 library(stringr)
 
-source("~/Proteomics-Results-Dashboard/R/boxPlot.R")
+library(tidyr)
+library(stringr)
+library(ggplot2)
+
+file.path(here::here(), "R", "boxPlot.R") |>
+  source()
 
 # move default data to sqlite file
 extdata <- system.file("extdata", package = 'ProtResDash')
 
-import_raw ( file.path(extdata, "peptides.txt"), 
-             file.path(extdata, "proteinGroups.txt"), 
-             "data/protein_peptidedb.sqlite")
+if(!file.exists("data/protein_peptidedb.sqlite")) {
+  import_raw ( file.path(extdata, "peptides.txt"), 
+               file.path(extdata, "proteinGroups.txt"), 
+               "data/protein_peptidedb.sqlite")
+}
 
 con <- dbConnect(SQLite(), dbname = "data/protein_peptidedb.sqlite")
 peptides <- tbl(con, "peptides")
@@ -95,12 +102,12 @@ ui <- div(
       column(
         width = 6,
         h3("Box plot"),
-        plotOutput("Box Plot")
+        plotOutput("boxPlot")
       ),
       column(
         width = 6,
         h3("Bar Plot"),
-        plotOutput("Bar Plot")
+        plotOutput("barPlot")
       )
      )
     )
@@ -140,46 +147,38 @@ server <- function(input, output, session) {
   })
   
   #PCA Plot
-  if (nrow(data) > 1 && ncol(data) > 1) 
-    
+  output$pcaPlot <- renderPlot ({
+    data <- proteins %>%
+      select(starts_with('Reporter.intensity.corrected')) %>%
+      select(1:10) |>
+      collect() 
+        
+    if (nrow(data) > 1 && ncol(data) > 1) 
     {
-      output$pcaPlot <- renderPlot ({
-        data <- proteins %>%
-          select(starts_with('Reporter.intensity.corrected')) %>%
-          select(1:10) |>
-          collect() 
+      pca_res <- prcomp(data, center = TRUE, scale. = TRUE)
+      pca_df <- as.data.frame(pca_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
         
-        pca_res <- prcomp(data, center = TRUE, scale. = TRUE)
-        pca_df <- as.data.frame(pca_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
-        
-        pcaPlot(data,
-                rep(c('Control', 'IgM'), each = 5))
+      pcaPlot(data,
+              rep(c('Control', 'IgM'), each = 5))
+    }else{
+      plot(NA, NA, xlim = 0:1, ylim = 0:1, type = "n", xlab = "",
+           main = "Not enough data for PCA")
+    }
+  }) 
       
-        
-        } ) 
-      
-      #Box Plot
-      {
-        output$boxPlot <- renderPlot ({
-          data <- proteins %>%
-            select(starts_with('Reporter.intensity.corrected')) %>%
-            select(1:10) |>
-            collect() 
+    #Box Plot
+  output$boxPlot <- renderPlot ({
+    data <- proteins %>%
+      select(starts_with('Reporter.intensity.corrected')) %>%
+      select(1:10) |>
+      collect() 
           
           # box_res <- prcomp(data, center = TRUE, scale. = TRUE)
           # box_df <- as.data.frame(box_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
-          # 
-          boxPlot(data)
-          
-        } ) 
-  
-  }
-  }
-    
-   else {
-    plot(NA, NA, xlim = 0:1, ylim = 0:1, type = "n", xlab = "",
-         main = "Not enough data for PCA")
-      }
+        
+    boxPlot(data)
+  } ) 
+
 } 
 
 shinyApp(ui, server) 
