@@ -13,8 +13,13 @@ library(tidyr)
 library(stringr)
 library(ggplot2)
 
+#Box plot
 file.path(here::here(), "R", "boxPlot.R") |>
   source()
+
+# #Bar plot
+ file.path(here::here(), "R", "barPlot.R") |>
+   source()
 
 # move default data to sqlite file
 extdata <- system.file("extdata", package = 'ProtResDash')
@@ -90,7 +95,7 @@ ui <- div(
     )
   ),
   
-  # New QC Tab
+  #QC Tab with plots: PCA, Box, and Bar
   tabPanel(
     "QC",
     fluidRow(
@@ -114,6 +119,7 @@ ui <- div(
   )
 )
 
+#Server
 server <- function(input, output, session) {
   
   output$proteinTable <- renderDT({
@@ -146,7 +152,7 @@ server <- function(input, output, session) {
     datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
   })
   
-  #PCA Plot
+  #PCA Plot#
   output$pcaPlot <- renderPlot ({
     data <- proteins %>%
       select(starts_with('Reporter.intensity.corrected')) %>%
@@ -166,17 +172,25 @@ server <- function(input, output, session) {
     }
   }) 
       
-    #Box Plot
+    #Box Plot#
   output$boxPlot <- renderPlot ({
     data <- proteins %>%
       select(starts_with('Reporter.intensity.corrected')) %>%
       select(1:10) |>
       collect() 
           
-          # box_res <- prcomp(data, center = TRUE, scale. = TRUE)
-          # box_df <- as.data.frame(box_res$x[, 1:2]) # Extract the first two principal components and convert to a data frame
-        
     boxPlot(data)
+  } ) 
+  
+  
+  #Bar Plot#
+  output$barPlot <- renderPlot ({
+    data <- proteins %>%
+      select(starts_with('Reporter.intensity.corrected')) %>%
+      select(1:10) |>
+      collect() 
+    
+    barPlot(data)
   } ) 
 
 } 
