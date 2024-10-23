@@ -20,3 +20,4 @@ barPlot <- function(data) {
   return(bar_plot)
   
 }
+

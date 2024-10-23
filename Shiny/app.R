@@ -141,15 +141,30 @@ server <- function(input, output, session) {
   output$peptideTable <- renderDT({
     req(input$proteinTable_rows_selected)
     
-    selectedProteinID <- proteins %>%
-      slice(row_number() == input$proteinTable_rows_selected) %>% 
-      pull(Protein.group.IDs) #Extract the Protein.group.IDs from the selected row. 
+    
+      selected_row <- input$proteinTable_rows_selected
+      
+      selectedProteinID <- proteins %>%
+      filter(row_number() == selected_row) %>%
+      pull(Protein.group.IDs)
+      
+      # slice(row_number() == input$proteinTable_rows_selected) %>% 
+      # pull(Protein.group.IDs) #Extract the Protein.group.IDs from the selected row. 
     
     selectedPeptides <- peptides %>% 
       filter(Protein.group.IDs == !!selectedProteinID[1]) %>%
-      collect()
-    
-    datatable(selectedPeptides, selection = 'single', options = list(pageLength = 4))
+      datatable(collect(select(peptides, c('Reporter.intensity.corrected.1',
+                                           'Reporter.intensity.corrected.2',
+                                           'Reporter.intensity.corrected.3',
+                                           'Reporter.intensity.corrected.4',
+                                           'Reporter.intensity.corrected.5',
+                                           'Reporter.intensity.corrected.6',
+                                           'Reporter.intensity.corrected.7',
+                                           'Reporter.intensity.corrected.8',
+                                           'Reporter.intensity.corrected.9',
+                                           'Reporter.intensity.corrected.10',
+                                           'Mod.peptide.IDs',
+                                           'Protein.group.IDs'))),  selection = 'single', options = list(pageLength = 4))
   })
   
   #PCA Plot#

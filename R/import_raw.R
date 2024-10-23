@@ -26,3 +26,4 @@ import_raw<- function(peptides_file, proteins_file, db_file) {
   #close the connection
   dbDisconnect(con)
 }
+
