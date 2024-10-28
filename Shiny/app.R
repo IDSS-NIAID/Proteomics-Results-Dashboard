@@ -125,7 +125,7 @@ server <- function(input, output, session) {
   output$proteinTable <- renderDT({
      req(proteins)
     
-    datatable(collect(select(proteins, c('Sequence','Mass','Proteins', 
+    protein_data <- collect(select(proteins, c('Sequence','Mass','Proteins', 
                                          'Reporter.intensity.corrected.1',
                                          'Reporter.intensity.corrected.2',
                                          'Reporter.intensity.corrected.3',
@@ -135,7 +135,8 @@ server <- function(input, output, session) {
                                          'Reporter.intensity.corrected.7',
                                          'Reporter.intensity.corrected.8',
                                          'Reporter.intensity.corrected.9',
-                                         'Reporter.intensity.corrected.10'))),  selection = 'single', options = list(pageLength = 4))
+                                         'Reporter.intensity.corrected.10')))  
+    datatable(protein_data, selection = 'single', options = list(pageLength = 4))
   })
   
   output$peptideTable <- renderDT({
@@ -145,15 +146,17 @@ server <- function(input, output, session) {
       selected_row <- input$proteinTable_rows_selected
       
       selectedProteinID <- proteins %>%
-      filter(row_number() == selected_row) %>%
-      pull(Protein.group.IDs)
+      filter(row_number() == selected_row) %>% 
+      pull(Protein.group.IDs) #Extract the Protein.group.IDs from the selected row.
       
       # slice(row_number() == input$proteinTable_rows_selected) %>% 
-      # pull(Protein.group.IDs) #Extract the Protein.group.IDs from the selected row. 
+      #Error: 'slice()' not supported on database backends
+      
     
     selectedPeptides <- peptides %>% 
       filter(Protein.group.IDs == !!selectedProteinID[1]) %>%
-      datatable(collect(select(peptides, c('Reporter.intensity.corrected.1',
+      collect() #Collect the data as a df
+      datatable(select(selectedPeptides, c('Reporter.intensity.corrected.1',
                                            'Reporter.intensity.corrected.2',
                                            'Reporter.intensity.corrected.3',
                                            'Reporter.intensity.corrected.4',
@@ -164,8 +167,11 @@ server <- function(input, output, session) {
                                            'Reporter.intensity.corrected.9',
                                            'Reporter.intensity.corrected.10',
                                            'Mod.peptide.IDs',
-                                           'Protein.group.IDs'))),  selection = 'single', options = list(pageLength = 4))
+                                           'Protein.group.IDs')), 
+                
+  selection = 'single', options = list(pageLength = 4))
   })
+  
   
   #PCA Plot#
   output$pcaPlot <- renderPlot ({
