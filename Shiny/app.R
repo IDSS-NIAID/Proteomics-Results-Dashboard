@@ -82,7 +82,8 @@ ui <- div(
            }
           "))
         )
-      ),
+      )),
+    fluidRow(
       column(
         width = 6,
         h3("Peptide Description:"),
@@ -101,13 +102,18 @@ ui <- div(
     fluidRow(
       column(
         width = 6,
+        h3("Box plo: Normalized"),
+        plotOutput("boxPlot")
+      ),
+      column(
+        width = 6,
         h3("PCA Plot"),
         plotOutput("pcaPlot")
       ),
       column(
         width = 6,
-        h3("Box plot"),
-        plotOutput("boxPlot")
+        h3("Box plot 2: No-normalized"),
+        plotOutput("boxPlot2")
       ),
       column(
         width = 6,
@@ -122,6 +128,7 @@ ui <- div(
 #Server
 server <- function(input, output, session) {
   
+  #Protein table
   output$proteinTable <- renderDT({
      req(proteins)
     
@@ -139,6 +146,7 @@ server <- function(input, output, session) {
     datatable(protein_data, selection = 'single', options = list(pageLength = 4))
   })
   
+  #Peptide table
   output$peptideTable <- renderDT({
     req(input$proteinTable_rows_selected)
     
@@ -149,14 +157,12 @@ server <- function(input, output, session) {
       filter(row_number() == selected_row) %>% 
       pull(Protein.group.IDs) #Extract the Protein.group.IDs from the selected row.
       
-      # slice(row_number() == input$proteinTable_rows_selected) %>% 
-      #Error: 'slice()' not supported on database backends
-      
     
     selectedPeptides <- peptides %>% 
       filter(Protein.group.IDs == !!selectedProteinID[1]) %>%
       collect() #Collect the data as a df
-      datatable(select(selectedPeptides, c('Reporter.intensity.corrected.1',
+      datatable(select(selectedPeptides, c('Protein.group.IDs',
+                                           'Reporter.intensity.corrected.1',
                                            'Reporter.intensity.corrected.2',
                                            'Reporter.intensity.corrected.3',
                                            'Reporter.intensity.corrected.4',
@@ -166,8 +172,7 @@ server <- function(input, output, session) {
                                            'Reporter.intensity.corrected.8',
                                            'Reporter.intensity.corrected.9',
                                            'Reporter.intensity.corrected.10',
-                                           'Mod.peptide.IDs',
-                                           'Protein.group.IDs')), 
+                                           'Mod..peptide.IDs')), 
                 
   selection = 'single', options = list(pageLength = 4))
   })
@@ -193,16 +198,35 @@ server <- function(input, output, session) {
     }
   }) 
       
-    #Box Plot#
+    #Box Plot 2: No-normalized
+  output$boxPlot2 <- renderPlot ({
+    data <- proteins %>%
+      select(starts_with('Reporter.intensity')) %>%
+      select(1:10) |>
+      collect() 
+          
+    boxPlot2(data)
+  } ) 
+  
+  #Box Plot: Normalized
   output$boxPlot <- renderPlot ({
     data <- proteins %>%
       select(starts_with('Reporter.intensity.corrected')) %>%
       select(1:10) |>
       collect() 
-          
+    
     boxPlot(data)
   } ) 
   
+  #Boxplot2: no-normalized
+  # output$boxPlot <- renderPlot ({
+  #   data <- proteins %>%
+  #     select(starts_with('Reporter.intensity')) %>%
+  #     select(1:10) |>
+  #     collect() 
+  #   data_matrix <- as.matrix(data)
+  #   boxPlot(data_matrix)
+  # } ) 
   
   #Bar Plot#
   output$barPlot <- renderPlot ({
