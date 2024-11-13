@@ -9,6 +9,7 @@
 #' @importFrom stats prcomp var
 #' @importFrom dplyr mutate
 #' @importFrom ggplot2 ggplot aes geom_point labs theme_minimal scale_color_brewer
+
 pcaPlot <- function(data, group) {
   
   # for those pesky no visible binding warnings

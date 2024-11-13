@@ -9,6 +9,9 @@ library(ProtResDash)
 library(tidyr)
 library(stringr)
 
+library(ComplexHeatmap)
+library(colorRamp2)
+
 library(tidyr)
 library(stringr)
 library(ggplot2)
@@ -16,10 +19,17 @@ library(ggplot2)
 #Box plot
 file.path(here::here(), "R", "boxPlot.R") |>
   source()
+#Box plot
+file.path(here::here(), "R", "boxPlot2.R") |>
+  source()
 
-# #Bar plot
+#Bar plot
  file.path(here::here(), "R", "barPlot.R") |>
    source()
+ 
+#Heatmap
+file.path(here::here(), "R", "heatMap.R") |>
+ source()
 
 # move default data to sqlite file
 extdata <- system.file("extdata", package = 'ProtResDash')
@@ -102,13 +112,8 @@ ui <- div(
     fluidRow(
       column(
         width = 6,
-        h3("Box plo: Normalized"),
+        h3("Box plot: Normalized"),
         plotOutput("boxPlot")
-      ),
-      column(
-        width = 6,
-        h3("PCA Plot"),
-        plotOutput("pcaPlot")
       ),
       column(
         width = 6,
@@ -117,9 +122,19 @@ ui <- div(
       ),
       column(
         width = 6,
+        h3("PCA Plot"),
+        plotOutput("pcaPlot")
+      ),
+      column(
+        width = 6,
         h3("Bar Plot"),
         plotOutput("barPlot")
-      )
+      ),
+       column(
+         width = 6,
+         h3("Heatmap"),
+         plotOutput("heatMap")
+       )
      )
     )
   )
@@ -132,6 +147,7 @@ server <- function(input, output, session) {
   output$proteinTable <- renderDT({
      req(proteins)
     
+    #remember to generalize this part
     protein_data <- collect(select(proteins, c('Sequence','Mass','Proteins', 
                                          'Reporter.intensity.corrected.1',
                                          'Reporter.intensity.corrected.2',
@@ -146,6 +162,8 @@ server <- function(input, output, session) {
     datatable(protein_data, selection = 'single', options = list(pageLength = 4))
   })
   
+  
+  
   #Peptide table
   output$peptideTable <- renderDT({
     req(input$proteinTable_rows_selected)
@@ -158,7 +176,7 @@ server <- function(input, output, session) {
       pull(Protein.group.IDs) #Extract the Protein.group.IDs from the selected row.
       
     
-    selectedPeptides <- peptides %>% 
+    selectedPeptides <- peptides %>%  #remember to generalize this part
       filter(Protein.group.IDs == !!selectedProteinID[1]) %>%
       collect() #Collect the data as a df
       datatable(select(selectedPeptides, c('Protein.group.IDs',
@@ -177,13 +195,12 @@ server <- function(input, output, session) {
   selection = 'single', options = list(pageLength = 4))
   })
   
-  
   #PCA Plot#
   output$pcaPlot <- renderPlot ({
     data <- proteins %>%
       select(starts_with('Reporter.intensity.corrected')) %>%
       select(1:10) |>
-      collect() 
+      collect()  #generalize 
         
     if (nrow(data) > 1 && ncol(data) > 1) 
     {
@@ -202,7 +219,7 @@ server <- function(input, output, session) {
   output$boxPlot2 <- renderPlot ({
     data <- proteins %>%
       select(starts_with('Reporter.intensity')) %>%
-      select(1:10) |>
+      select(11:20) |>
       collect() 
           
     boxPlot2(data)
@@ -218,16 +235,6 @@ server <- function(input, output, session) {
     boxPlot(data)
   } ) 
   
-  #Boxplot2: no-normalized
-  # output$boxPlot <- renderPlot ({
-  #   data <- proteins %>%
-  #     select(starts_with('Reporter.intensity')) %>%
-  #     select(1:10) |>
-  #     collect() 
-  #   data_matrix <- as.matrix(data)
-  #   boxPlot(data_matrix)
-  # } ) 
-  
   #Bar Plot#
   output$barPlot <- renderPlot ({
     data <- proteins %>%
@@ -237,14 +244,25 @@ server <- function(input, output, session) {
     
     barPlot(data)
   } ) 
+  
+  #ComplexHeatmap
+  output$heatMap <- renderPlot({
+   data_matrix <- proteins %>%
+    select(starts_with('Reporter.intensity.corrected')) %>%
+    select(1:10) |>
+    collect() |> 
+    as.matrix()
+   
+   sub_mat <- data_matrix[1:10, 1:10] #take first 10 rows & col from data_matrix
+   #we convert the data -> matrix, then we create a sub_matrix -> display heatmap of sub_matrix
+    
+    heatMap(sub_mat)  
+  })
 
 } 
 
 shinyApp(ui, server) 
   
-
-
-
 
 
 
