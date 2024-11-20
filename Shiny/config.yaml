@@ -1,0 +1,39 @@
+
+database:
+  file: "data/protein_peptidedb.sqlite"
+
+themes:
+  base_theme: "quartz"
+
+protein_theme:
+    background_color: "#f8f9fa"
+    padding: "10px"
+    border_radius: "5px"
+    box_shadow: "0 4px 8px rgba(0,0,0,0.1)"
+peptide_theme:
+    background_color: "#e9ecef"
+    padding: "10px"
+    border_radius: "5px"
+    box_shadow: "0 4px 8px rgba(0,0,0,0.1)"
+
+columns:
+  protein_table:
+    - "Sequence"
+    - "Mass"
+    - "Proteins"
+    - !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
+  peptide_table:
+    - "Protein.group.IDs"
+    - "Mod..peptide.IDs"
+    - !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
+
+plots:
+  pca:
+    principal_components: 2
+    grouping: ["Control", "IgM"]
+  boxplot:
+    normalized_columns: !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
+    non_normalized_columns: !!expr reporter_intensity_columns("Reporter.intensity", 11:20)
+  barplot:
+    intensity_columns: !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
+
