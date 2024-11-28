@@ -1,39 +1,139 @@
+# YAML configuration file
 
+# Database configuration
 database:
-  file: "data/protein_peptidedb.sqlite"
+  type: "SQLite"
+  path: "data/protein_peptidedb.sqlite"
+  extdata:
+    package: "ProtResDash"
+    peptides_file: "peptides.txt"
+    protein_groups_file: "proteinGroups.txt"
 
-themes:
-  base_theme: "quartz"
+app:
+  title: "Protein and Peptide Viewer"
+  theme: "quartz"
+  base_theme_rules:
+    protein:
+      background-color: "#f8f9fa"
+      padding: "10px"
+      border-radius: "5px"
+      box-shadow: "0 4px 8px rgba(0,0,0,0.1)"
+    peptide:
+      background-color: "#e9ecef"
+      padding: "10px"
+      border-radius: "5px"
+      box-shadow: "0 4px 8px rgba(0,0,0,0.1)"
 
-protein_theme:
-    background_color: "#f8f9fa"
-    padding: "10px"
-    border_radius: "5px"
-    box_shadow: "0 4px 8px rgba(0,0,0,0.1)"
-peptide_theme:
-    background_color: "#e9ecef"
-    padding: "10px"
-    border_radius: "5px"
-    box_shadow: "0 4px 8px rgba(0,0,0,0.1)"
+# UI
+ui:
+  navbar_title: "Protein and Peptide Viewer"
+  tabs:
+    - name: "Home"
+      layout:
+        fluidRow:
+          - column: 6
+            content:
+              - header: "Select a Protein:"
+                class: "protein-theme"
+                output: "proteinTable"
+          - column: 6
+            content:
+              - header: "Peptide Description:"
+                class: "peptide-theme"
+                output: "peptideTable"
+    - name: "QC"
+      layout:
+        fluidRow:
+          - column: 6
+            content:
+              - header: "Box plot: Normalized"
+                output: "boxPlot"
+          - column: 6
+            content:
+              - header: "Box plot 2: No-normalized"
+                output: "boxPlot2"
+          - column: 6
+            content:
+              - header: "PCA Plot"
+                output: "pcaPlot"
+          - column: 6
+            content:
+              - header: "Bar Plot"
+                output: "barPlot"
 
-columns:
+# Server: tables 
+tables:
   protein_table:
-    - "Sequence"
-    - "Mass"
-    - "Proteins"
-    - !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
+    columns:
+      - Sequence
+      - Mass
+      - Proteins
+      - Reporter.intensity.corrected.1
+      - Reporter.intensity.corrected.2
+      - Reporter.intensity.corrected.3
+      - Reporter.intensity.corrected.4
+      - Reporter.intensity.corrected.5
+      - Reporter.intensity.corrected.6
+      - Reporter.intensity.corrected.7
+      - Reporter.intensity.corrected.8
+      - Reporter.intensity.corrected.9
+      - Reporter.intensity.corrected.10
+    page_length: 4
+  
   peptide_table:
-    - "Protein.group.IDs"
-    - "Mod..peptide.IDs"
-    - !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
+    columns:
+      - Protein.group.IDs
+      - Mod..peptide.IDs
+      - Reporter.intensity.corrected.1
+      - Reporter.intensity.corrected.2
+      - Reporter.intensity.corrected.3
+      - Reporter.intensity.corrected.4
+      - Reporter.intensity.corrected.5
+      - Reporter.intensity.corrected.6
+      - Reporter.intensity.corrected.7
+      - Reporter.intensity.corrected.8
+      - Reporter.intensity.corrected.9
+      - Reporter.intensity.corrected.10
+    page_length: 4
 
+# Plots
 plots:
-  pca:
-    principal_components: 2
-    grouping: ["Control", "IgM"]
-  boxplot:
-    normalized_columns: !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
-    non_normalized_columns: !!expr reporter_intensity_columns("Reporter.intensity", 11:20)
-  barplot:
-    intensity_columns: !!expr reporter_intensity_columns("Reporter.intensity.corrected", 1:10)
+  box_plot:
+    type: "Box plot"
+    output: "boxPlot"
+    data_columns:
+      - starts_with: "Reporter.intensity.corrected"
+    range: [1, 10]
+  box_plot2:
+    type: "Box plot 2"
+    output: "boxPlot2"
+    data_columns:
+      - starts_with: "Reporter.intensity"
+    range: [11, 20]  
+  pca_plot:
+    type: "PCA Plot"
+    output: "pcaPlot"
+    data_columns:
+      - starts_with: "Reporter.intensity.corrected"
+    range: [1, 10]
+  bar_plot:
+    type: "Bar Plot"
+    output: "barPlot"
+    data_columns:
+      - starts_with: "Reporter.intensity.corrected"
+    range: [1, 10]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
