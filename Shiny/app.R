@@ -81,7 +81,7 @@ ui <- div(
       fluidRow(
         column(
           width = config$ui$tabs[[1]]$layout$fluidRow[[2]]$column,
-          h3("Peptide Description:"),
+         h3(textOutput("peptideHeader")),
           tags$div(
             class = "peptide-theme",
             DTOutput("peptideTable")
@@ -117,22 +117,29 @@ server <- function(input, output, session) {
     datatable(protein_data, selection = 'single', options = list(pageLength = config$tables$protein_table$page_length))
   })
   
+  ReactiveHeader <- reactiveVal("")
+  
   # Peptide Table
+  output$peptideHeader <- renderText(
+    ReactiveHeader())
+  
   output$peptideTable <- renderDT({
     req(input$proteinTable_rows_selected)
     
+    ReactiveHeader("Peptide Description:")
     selected_row <- input$proteinTable_rows_selected
     selectedProteinID <- proteins %>%
-    filter(row_number() == selected_row) %>%
-    pull(Protein.group.IDs) # Extract the Protein.group.IDs from the selected row
+      filter(row_number() == selected_row) %>%
+      pull(Protein.group.IDs) # Extract the Protein.group.IDs from the selected row
     
     selectedPeptides <- peptides %>%
-    filter(Protein.group.IDs == !!selectedProteinID[1]) %>%
-    collect() # Collect the data as a df
+      filter(Protein.group.IDs == !!selectedProteinID[1]) %>%
+      collect() # Collect the data as a df
     
     datatable(select(selectedPeptides, all_of(config$tables$peptide_table$columns)),
-    selection = 'single', options = list(pageLength = config$tables$peptide_table$page_length))
+              selection = 'single', options = list(pageLength = config$tables$peptide_table$page_length))
   })
+  
   
   # PCA Plot
   output$pcaPlot <- renderPlot({
