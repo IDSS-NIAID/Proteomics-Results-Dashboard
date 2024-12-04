@@ -98,7 +98,7 @@ ui <- div(
           column(
             width = 6,
             h3(plot$type),
-            plotOutput(plot$type)
+            plotOutput(plot$output)
           )
         })
       )
@@ -137,8 +137,8 @@ server <- function(input, output, session) {
   # PCA Plot
   output$pcaPlot <- renderPlot({
     data <- proteins %>%
-      select(starts_with(config$plots$pca_plot$data_columns$starts_with)) %>%
-      select(config$plots$pca_plot$range[1]:config$plots$pca_plot$range[2]) %>%
+      select(starts_with(config$plots$pca_plot$starts_with)) %>%
+      select(config$plots$pca_plot$range[1]:config$plots$pca_plot$range[2]) |>
       collect()
     
     if (nrow(data) > 1 && ncol(data) > 1) {
@@ -158,7 +158,7 @@ server <- function(input, output, session) {
   # Box Plot: Normalized
   output$boxPlot <- renderPlot({
     data <- proteins %>%
-      select(starts_with(config$plots$box_plot$data_columns$starts_with)) %>%
+      select(starts_with(config$plots$box_plot$starts_with)) %>%
       select(config$plots$box_plot$range[1]:config$plots$box_plot$range[2]) |>
       collect()
     
@@ -168,7 +168,7 @@ server <- function(input, output, session) {
   # Box Plot 2: No-normalized 
   output$boxPlot2 <- renderPlot({
     data <- proteins %>%
-      select(starts_with(config$plots$box_plot2$data_columns$starts_with)) %>%
+      select(starts_with(config$plots$box_plot2$starts_with)) %>%
       select(config$plots$box_plot2$range[1]:config$plots$box_plot2$range[2]) |>
       collect()
     
@@ -178,7 +178,7 @@ server <- function(input, output, session) {
   # Bar Plot
   output$barPlot <- renderPlot({
     data <- proteins %>%
-      select(starts_with(config$plots$bar_plot$data_columns$starts_with)) %>%
+      select(starts_with(config$plots$bar_plot$starts_with)) %>%
       select(config$plots$bar_plot$range[1]:config$plots$bar_plot$range[2]) |>
       collect()
     

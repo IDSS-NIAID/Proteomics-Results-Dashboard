@@ -101,26 +101,22 @@ plots:
   box_plot:
     type: "Box plot"
     output: "boxPlot"
-    data_columns:
-      - starts_with: "Reporter.intensity.corrected"
+    starts_with: "Reporter.intensity.corrected"
     range: [1, 10]
   box_plot2:
     type: "Box plot 2"
     output: "boxPlot2"
-    data_columns:
-      - starts_with: "Reporter.intensity"
+    starts_with: "Reporter.intensity"
     range: [11, 20]  
   pca_plot:
     type: "PCA Plot"
     output: "pcaPlot"
-    data_columns:
-      - starts_with: "Reporter.intensity.corrected"
+    starts_with: "Reporter.intensity.corrected"
     range: [1, 10]
   bar_plot:
     type: "Bar Plot"
     output: "barPlot"
-    data_columns:
-      - starts_with: "Reporter.intensity.corrected"
+    starts_with: "Reporter.intensity.corrected"
     range: [1, 10]
 
 
